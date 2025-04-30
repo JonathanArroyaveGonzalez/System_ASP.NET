@@ -1,4 +1,4 @@
-# Sistema de Votaciones para Asambleas de Propiedad Horizontal
+# Sistema de Votaciones para Asambleas de Propiedad Horizontal 
 
 ## Tabla de Contenido
 1. [Descripci처n del Proyecto](#descripci처n-del-proyecto)
@@ -17,7 +17,7 @@ El Sistema de Votaciones para Asambleas de Propiedad Horizontal es una aplicaci�
 
 ## Diagrama Entidad-Relaci처n
 
-![Diagrama Entidad-Relaci처n](https://github.com/JonathanArroyaveGonzalez/System_ASP.NET/blob/main/wwwroot/assets/ER_diagram.png?raw=true)
+![Diagrama Entidad-Relaci처n](https://raw.githubusercontent.com/JonathanArroyaveGonzalez/System_ASP.NET/refs/heads/main/wwwroot/assets/ER_diagram.png)
 
 ## Diagrama de Casos de Uso
 
