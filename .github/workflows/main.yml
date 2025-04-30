@@ -16,21 +16,21 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.x' # Ajusta si estás usando .NET 6, 7, etc.
+          dotnet-version: '8.x' # Cambia si usas otra versión
 
       - name: Restore dependencies
-        run: dotnet restore ./VotingSystem/VotingSystem.csproj
+        run: dotnet restore VotingSystem.csproj
 
       - name: Build project
-        run: dotnet build --configuration Release ./VotingSystem/VotingSystem.csproj
+        run: dotnet build --configuration Release VotingSystem.csproj
 
       - name: Publish project
-        run: dotnet publish --configuration Release --output ./publish ./VotingSystem/VotingSystem.csproj
+        run: dotnet publish --configuration Release --output ./publish VotingSystem.csproj
 
       - name: Deploy to SmarterASP.NET
         uses: aarhusit/deploy@main
         with:
-          csproj-filepath: VotingSystem\VotingSystem.csproj
+          csproj-filepath: VotingSystem.csproj
           website-name: julian2025-001-site1
           server-computer-name: https://win1240.site4now.net:8172
           server-username: julian2025-001
