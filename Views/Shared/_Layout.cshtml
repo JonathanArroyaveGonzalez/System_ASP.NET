@@ -1,46 +1,136 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - VotingSystem</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <title>@ViewData["Title"] - Sistema de Votaciones para Asambleas</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/flatly/bootstrap.min.css">
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/VotingSystem.styles.css" asp-append-version="true" />
+    <!--<link rel="stylesheet" href="~/VotingSystem.styles.css" asp-append-version="true" /> -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">VotingSystem</a>
+    <header class="main-header">
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-vote-yea me-2"></i>
+                    <span>Sistema de Votaciones</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="navbar-collapse collapse">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="fas fa-home me-1"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="asambleasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-users me-1"></i> Asambleas
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="asambleasDropdown">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Asambleas" asp-action="Index">Ver Asambleas</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Asambleas" asp-action="Create">Nueva Asamblea</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Asambleas" asp-action="Calendar">Calendario</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="votacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-poll me-1"></i> Votaciones
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="votacionesDropdown">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Votaciones" asp-action="Index">Ver Votaciones</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Votaciones" asp-action="Active">Votaciones Activas</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Votaciones" asp-action="Results">Resultados</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-controller="Reportes" asp-action="Index">
+                                <i class="fas fa-chart-bar me-1"></i> Reportes
+                            </a>
                         </li>
                     </ul>
+                    <partial name="_LoginPartial" />
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container main-container">
+        <div class="row">
+            <div class="col-12">
+                @if (ViewData["Title"] != null)
+                {
+                    <div class="page-header">
+                        <h1>@ViewData["Title"]</h1>
+                        @if (ViewData["Subtitle"] != null)
+                        {
+                            <p class="text-muted">@ViewData["Subtitle"]</p>
+                        }
+                    </div>
+                }
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="bg-dark text-light pt-5 pb-3 mt-5">
         <div class="container">
-            &copy; 2025 - VotingSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row gy-4">
+                <div class="col-md-4">
+                    <h5 class="text-uppercase mb-3">Sistema de Votaciones</h5>
+                    <p>Plataforma digital para la gestión de votaciones en asambleas de propiedad horizontal.</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-uppercase mb-3">Enlaces</h5>
+                    <ul class="list-unstyled">
+                        <li><a asp-controller="Home" asp-action="Index" class="text-light text-decoration-none">Inicio</a></li>
+                        <li><a asp-controller="Home" asp-action="Privacy" class="text-light text-decoration-none">Privacidad</a></li>
+                        <li><a asp-controller="Home" asp-action="About" class="text-light text-decoration-none">Acerca de</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-uppercase mb-3">Contacto</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-envelope me-2"></i> soporte@votaciones.com</li>
+                        <li><i class="fas fa-phone me-2"></i> +57 123 456 7890</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-light my-4">
+            <div class="text-center">
+                <small>&copy; @DateTime.Now.Year Sistema de Votaciones - Todos los derechos reservados</small>
+            </div>
         </div>
     </footer>
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

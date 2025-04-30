@@ -1,15 +1,15 @@
 # Sistema de Votaciones para Asambleas de Propiedad Horizontal 
 
 ## Tabla de Contenido
-1. [Descripción del Proyecto](#descripción-del-proyecto)
-2. [Diagrama Entidad-Relación](#diagrama-entidad-relación)
+1. [Descripción del Proyecto](#descripcion-del-proyecto)
+2. [Diagrama Entidad-Relación](#diagrama-entidad-relacion)
 3. [Diagrama de Casos de Uso](#diagrama-de-casos-de-uso)
-4. [Especificación de Requisitos](#especificación-de-requisitos)
+4. [Especificación de Requisitos](#especificacion-de-requisitos)
    - [Requisitos Funcionales](#requisitos-funcionales)
    - [Requisitos No Funcionales](#requisitos-no-funcionales)
 5. [Especificación de Casos de Uso](#especificación-de-casos-de-uso)
 6. [Arquitectura del Sistema](#arquitectura-del-sistema)
-7. [Metodología de Desarrollo](#metodología-de-desarrollo)
+7. [Metodología de Desarrollo](#metodologia-de-desarrollo)
 
 ## Descripción del Proyecto
 
