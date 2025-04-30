@@ -1,0 +1,37 @@
+name: Publish via Web Deploy to smarterasp.net
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Checkout, Publish and Deploy to SmarterASP.NET
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x' # Cambia si usas otra versión de .NET
+
+      - name: Restore dependencies
+        run: dotnet restore ./MiApp.Web/MiApp.Web.csproj
+
+      - name: Build project
+        run: dotnet build --configuration Release ./MiApp.Web/MiApp.Web.csproj
+
+      - name: Publish project
+        run: dotnet publish --configuration Release --output ./publish ./MiApp.Web/MiApp.Web.csproj
+
+      - name: Deploy to SmarterASP.NET
+        uses: aarhusit/deploy@main
+        with:
+          csproj-filepath: MiApp.Web\MiApp.Web.csproj
+          website-name: julian2025-001-site1
+          server-computer-name: https://win1240.site4now.net:8172
+          server-username: julian2025-001
+          server-password: ${{ secrets.PASSWORD }}
