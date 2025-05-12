@@ -14,12 +14,7 @@ public class AsambleasController : Controller
         return View();
     }
 
-    [HttpPost]
-    public IActionResult Create(Asamblea model)
-    {
-        // Lógica para crear asamblea
-        return RedirectToAction("Asambleas/Index");
-    }
+   
 
     public IActionResult Calendar()
     {

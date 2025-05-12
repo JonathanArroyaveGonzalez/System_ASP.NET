@@ -24,41 +24,87 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home me-1"></i> Inicio
-                            </a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="asambleasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-users me-1"></i> Asambleas
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="asambleasDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Asambleas" asp-action="Index">Ver Asambleas</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Asambleas" asp-action="Create">Nueva Asamblea</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Asambleas" asp-action="Calendar">Calendario</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="votacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-poll me-1"></i> Votaciones
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="votacionesDropdown">
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Votaciones" asp-action="Index">Ver Votaciones</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Votaciones" asp-action="Active">Votaciones Activas</a></li>
-                                <li><a class="dropdown-item" asp-area="" asp-controller="Votaciones" asp-action="Results">Resultados</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Reportes" asp-action="Index">
-                                <i class="fas fa-chart-bar me-1"></i> Reportes
-                            </a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
-                </div>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <ul class="navbar-nav me-auto">
+                            <!-- Elementos comunes para ambos roles -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">
+                                    <i class="fas fa-home me-1"></i> Inicio
+                                </a>
+                            </li>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="asambleasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-users me-1"></i> Asambleas
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="asambleasDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Index">Ver Asambleas</a></li>
+                                    @if (User.IsInRole("admin"))
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Create">Nueva Asamblea</a></li>
+                                    }
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Calendar">Calendario</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Solo para admin -->
+                            @if (User.IsInRole("admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-cog me-1"></i> Administración
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">Usuarios</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="CreateAdmin">Nuevo Admin</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Restricciones" asp-action="Index">Restricciones</a></li>
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-user-circle me-1"></i> @User.Identity.Name
+                                    @if (User.IsInRole("admin"))
+                                    {
+                                        <span class="badge bg-danger ms-1">Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-primary ms-1">Propietario</span>
+                                    }
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="fas fa-user me-1"></i> Perfil</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-1"></i> Cerrar sesión</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav ms-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Index">
+                                    <i class="fas fa-sign-in-alt me-1"></i> Iniciar sesión
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">
+                                    <i class="fas fa-user-plus me-1"></i> Registrarse
+                                </a>
+                            </li>
+                        </ul>
+                    }
             </div>
         </nav>
     </header>
