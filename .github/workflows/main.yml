@@ -31,7 +31,7 @@ jobs:
         uses: aarhusit/deploy@main
         with:
           csproj-filepath: VotingSystem.csproj
-          website-name: julian2025-001-site1
-          server-computer-name: https://win1240.site4now.net:8172
-          server-username: julian2025-001
+          website-name: daniel190-001-site1
+          server-computer-name: https://win1135.site4now.net:8172
+          server-username: daniel190-001
           server-password: ${{ secrets.PASSWORD }}
