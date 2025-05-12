@@ -17,7 +17,9 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.x' # Cambia si usas otra versión
-
+      - name: Clean 
+        run: dotnet clean
+        
       - name: Restore dependencies
         run: dotnet restore VotingSystem.csproj
 
