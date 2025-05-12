@@ -52,7 +52,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication(); // ✅ Siempre primero
+app.UseAuthentication(); //  Siempre primero
 app.UseAuthorization();
 
 app.MapControllerRoute(
