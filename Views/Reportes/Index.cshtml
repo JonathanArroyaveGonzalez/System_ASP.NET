@@ -1,8 +1,50 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<VotingSystem.Models.Reporte>
+
+@{
+    ViewData["Title"] = "Reportes";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tipo</th>
+            <th>Título</th>
+            <th>Fecha de Generación</th>
+            <th>Generado Por</th>
+            <th>Formato</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.Tipo</td>
+                <td>@item.Titulo</td>
+                <td>@item.FechaGeneracion?.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @item.GeneradoPorNavigation?.Nombre @item.GeneradoPorNavigation?.Apellido
+                </td>
+                <td>@item.Formato</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                    <a asp-action="ExportarPDF" asp-route-asambleaId="@item.Id" class="btn btn-danger btn-sm">
+                        <i class="fas fa-file-pdf"></i> PDF
+                    </a>
+                    <a asp-action="GenerarReporteVotacion" asp-route-asambleaId="@item.Id" class="btn btn-primary btn-sm">
+                        <i class="fas fa-chart-bar"></i> Ver Reporte de Votación
+                    </a>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+
+
+<a asp-action="Create" class="btn btn-primary">Crear Nuevo Reporte</a>

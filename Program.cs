@@ -69,4 +69,9 @@ app.MapControllerRoute(
     pattern: "register",
     defaults: new { controller = "Account", action = "Register" });
 
+app.MapControllerRoute(
+    name: "Reportes",
+    pattern: "Reportes",
+    defaults: new { controller = "Reportes", action = "Index" });
+
 app.Run();
