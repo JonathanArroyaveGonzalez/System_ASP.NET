@@ -1,0 +1,27 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Histórico de Votaciones";
+}
+
+<h1>Votaciones</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Asamblea</th>
+            <th>Fecha</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Usuario</td>
+                <td>@item.Asamblea</td>
+                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+            </tr>
+        }
+    </tbody>
+</table>

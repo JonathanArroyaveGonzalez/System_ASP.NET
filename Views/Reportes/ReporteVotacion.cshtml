@@ -1,0 +1,95 @@
+﻿@model dynamic
+
+@{
+    ViewData["Title"] = "Reporte de Votación";
+}
+
+<h1>Votación</h1>
+<h2>Asamblea: @Model.Asamblea</h2>
+<p>Fecha: @Model.Fecha.ToString("dd/MM/yyyy")</p>
+
+<div>
+    <h3>Resultados de Votaciones</h3>
+    @foreach (var votacion in Model.Votaciones)
+    {
+        <h4>Votación ID: @votacion.Id</h4>
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <canvas id="bar-chart-@votacion.Id" width="400" height="200"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="pie-chart-@votacion.Id" width="400" height="200"></canvas>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        @foreach (var votacion in Model.Votaciones)
+        {
+            <text>
+                var labels_@votacion.Id = [
+                @foreach (var opcion in votacion.Opciones)
+                {
+                    @: "@opcion.Texto",
+                }
+                ];
+                var data_@votacion.Id = [
+                @foreach (var opcion in votacion.Opciones)
+                {
+                    @: @opcion.CantidadVotos,
+                }
+                ];
+                var pieColors_@votacion.Id = [
+                    'rgba(54, 162, 235, 0.7)',
+                    'rgba(255, 99, 132, 0.7)',
+                    'rgba(255, 206, 86, 0.7)',
+                    'rgba(75, 192, 192, 0.7)',
+                    'rgba(153, 102, 255, 0.7)',
+                    'rgba(255, 159, 64, 0.7)'
+                ];
+
+                var ctxBar_@votacion.Id = document.getElementById('bar-chart-@votacion.Id').getContext('2d');
+                new Chart(ctxBar_@votacion.Id, {
+                    type: 'bar',
+                    data: {
+                        labels: labels_@votacion.Id,
+                        datasets: [{
+                            label: 'Resultados',
+                            data: data_@votacion.Id,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+
+                var ctxPie_@votacion.Id = document.getElementById('pie-chart-@votacion.Id').getContext('2d');
+                new Chart(ctxPie_@votacion.Id, {
+                    type: 'pie',
+                    data: {
+                        labels: labels_@votacion.Id,
+                        datasets: [{
+                            data: data_@votacion.Id,
+                            backgroundColor: pieColors_@votacion.Id
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            </text>
+        }
+    </script>
+}

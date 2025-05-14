@@ -48,6 +48,28 @@
                                     <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Calendar">Calendario</a></li>
                                 </ul>
                             </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="registrosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-clipboard-list me-1"></i> Registros
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="registrosDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reportes" asp-action="Index">
+                                            <i class="fas fa-file-alt me-1"></i> Ver Reportes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Reportes" asp-action="Historico">
+                                            <i class="fas fa-history me-1"></i> Histórico de Votaciones
+                                        </a>
+                                    </li>
+@*                                     <li>
+                                        <a class="dropdown-item" asp-controller="Reportes" asp-action="GenerarReporteVotacion">
+                                            <i class="fas fa-chart-bar me-1"></i> Reporte de Votación
+                                        </a>
+                                    </li> *@
+                                </ul>
+                            </li>
 
                             <!-- Solo para admin -->
                             @if (User.IsInRole("admin"))
