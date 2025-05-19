@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using VotingSystem.Models;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
@@ -44,15 +44,65 @@ namespace VotingSystem.Controllers
             }
 
             var reporte = _context.Reportes
-                .Include(r => r.GeneradoPorNavigation) // Incluye el usuario creador
+                .Include(r => r.GeneradoPorNavigation)
                 .FirstOrDefault(m => m.Id == id);
+
             if (reporte == null)
             {
                 return NotFound();
             }
 
-            return View("~/Views/Reportes/Details.cshtml", reporte);
+            // Relaciona por ID, no por título
+            var asamblea = _context.Asambleas
+                .Include(a => a.Votacions)
+                    .ThenInclude(v => v.OpcionVotacions)
+                .Include(a => a.Votacions)
+                    .ThenInclude(v => v.Votos)
+                        .ThenInclude(vt => vt.Usuario)
+                .FirstOrDefault(a => a.Id == reporte.Id); // <-- Relación por ID
+
+            var participantes = new List<dynamic>();
+            var votaciones = new List<dynamic>();
+
+            if (asamblea != null && asamblea.Votacions != null)
+            {
+                foreach (var votacion in asamblea.Votacions)
+                {
+                    var opciones = votacion.OpcionVotacions.Select(o => new
+                    {
+                        o.Texto,
+                        o.Descripcion,
+                        CantidadVotos = votacion.Votos.Count(vt => vt.OpcionId == o.Id)
+                    }).ToList();
+
+                    votaciones.Add(new
+                    {
+                        votacion.Id,
+                        votacion.Titulo,
+                        Opciones = opciones
+                    });
+
+                    participantes.AddRange(
+                        votacion.Votos
+                            .Where(v => v.Usuario != null)
+                            .Select(v => new { Nombre = v.Usuario.Nombre + " " + v.Usuario.Apellido, Email = v.Usuario.Email })
+                    );
+                }
+            }
+
+            var viewModel = new
+            {
+                Reporte = reporte,
+                Asamblea = asamblea,
+                Votaciones = votaciones,
+                Participantes = participantes.Distinct().ToList()
+            };
+
+            return View("~/Views/Reportes/Details.cshtml", viewModel);
         }
+
+
+
 
 
         // GET: Reportes/Create
@@ -193,7 +243,7 @@ namespace VotingSystem.Controllers
                     {
                         o.Texto,
                         o.Descripcion,
-                        // Conteo de votos para esta opci�n
+                        // Conteo de votos para esta opción
                         CantidadVotos = v.Votos.Count(vt => vt.OpcionId == o.Id)
                     })
                 })
@@ -214,12 +264,45 @@ namespace VotingSystem.Controllers
 
             var asamblea = _context.Asambleas
                 .Include(a => a.Votacions)
-                .ThenInclude(v => v.OpcionVotacions)
+                    .ThenInclude(v => v.OpcionVotacions)
+                .Include(a => a.Votacions)
+                    .ThenInclude(v => v.Votos)
+                        .ThenInclude(vt => vt.Usuario)
                 .FirstOrDefault(a => a.Id == asambleaId);
 
             if (asamblea == null)
             {
                 return NotFound();
+            }
+
+            // Buscar el reporte asociado a la asamblea (ajusta si tienes otra relación)
+            var reporte = _context.Reportes
+                .Include(r => r.GeneradoPorNavigation)
+                .FirstOrDefault(r => r.Id == asambleaId);
+
+            // Datos generales
+            string creador = reporte?.GeneradoPorNavigation != null
+                ? reporte.GeneradoPorNavigation.Nombre + " " + reporte.GeneradoPorNavigation.Apellido
+                : "Desconocido";
+
+            var participantes = new HashSet<(string Nombre, string Email)>();
+            var resultadosPorVotacion = new List<(int VotacionId, string VotacionTitulo, List<(string Opcion, string Descripcion, int Cantidad)>)>();
+
+            foreach (var votacion in asamblea.Votacions)
+            {
+                var resultados = new List<(string, string, int)>();
+                foreach (var opcion in votacion.OpcionVotacions)
+                {
+                    int cantidad = votacion.Votos.Count(v => v.OpcionId == opcion.Id);
+                    resultados.Add((opcion.Texto, opcion.Descripcion ?? "", cantidad));
+                }
+                resultadosPorVotacion.Add((votacion.Id, votacion.Titulo, resultados));
+
+                foreach (var voto in votacion.Votos)
+                {
+                    if (voto.Usuario != null)
+                        participantes.Add((voto.Usuario.Nombre + " " + voto.Usuario.Apellido, voto.Usuario.Email));
+                }
             }
 
             // Generar PDF usando iTextSharp
@@ -229,16 +312,51 @@ namespace VotingSystem.Controllers
                 PdfWriter.GetInstance(document, stream);
                 document.Open();
 
+                // Creador
+                document.Add(new Paragraph($"Creador: {creador}"));
                 document.Add(new Paragraph($"Reporte de Asamblea: {asamblea.Titulo}"));
-                document.Add(new Paragraph($"Fecha: {asamblea.Fecha}"));
+                document.Add(new Paragraph($"Fecha: {asamblea.Fecha:dd/MM/yyyy}"));
+                document.Add(new Paragraph(" "));
 
-                foreach (var votacion in asamblea.Votacions)
+                foreach (var votacion in resultadosPorVotacion)
                 {
-                    document.Add(new Paragraph($"Votaci�n ID: {votacion.Id}"));
-                    foreach (var opcion in votacion.OpcionVotacions)
+                    document.Add(new Paragraph($"Votación ID: {votacion.VotacionId}"));
+                    document.Add(new Paragraph($"Título: {votacion.VotacionTitulo}"));
+
+                    // Opciones y descripciones
+                    foreach (var opcion in votacion.Item3)
                     {
-                        document.Add(new Paragraph($"- {opcion.Texto}: {opcion.Descripcion}"));
+                        document.Add(new Paragraph($"\"{opcion.Opcion}\": \"{opcion.Descripcion}\""));
                     }
+
+                    document.Add(new Paragraph(" "));
+
+                    // Gráfica de barras simple (usando PdfPTable como barras)
+                    document.Add(new Paragraph("Resultados:"));
+                    var maxVotos = votacion.Item3.Max(x => x.Cantidad);
+                    var table = new PdfPTable(2) { WidthPercentage = 80 };
+                    table.AddCell("Opción");
+                    table.AddCell("Votos");
+
+                    foreach (var opcion in votacion.Item3)
+                    {
+                        table.AddCell(opcion.Opcion);
+
+                        // "Dibuja" una barra con caracteres según la cantidad de votos
+                        int barLength = maxVotos > 0 ? (int)Math.Round((opcion.Cantidad / (double)maxVotos) * 30) : 0;
+                        string bar = new string('█', barLength) + $" ({opcion.Cantidad})";
+                        table.AddCell(bar);
+                    }
+                    document.Add(table);
+
+                    document.Add(new Paragraph(" "));
+                }
+
+                // Participantes
+                document.Add(new Paragraph("Participantes:"));
+                foreach (var p in participantes)
+                {
+                    document.Add(new Paragraph($"{p.Nombre} ({p.Email})"));
                 }
 
                 document.Close();
@@ -246,6 +364,8 @@ namespace VotingSystem.Controllers
                 return File(stream.ToArray(), "application/pdf", "Reporte.pdf");
             }
         }
+
+
         // GET: Reportes/ExportarExcel/5
         public IActionResult ExportarExcel(int? asambleaId)
         {
@@ -275,7 +395,7 @@ namespace VotingSystem.Controllers
                 int row = 5;
                 foreach (var votacion in asamblea.Votacions)
                 {
-                    worksheet.Cells[row, 1].Value = $"Votaci�n ID: {votacion.Id}";
+                    worksheet.Cells[row, 1].Value = $"Votación ID: {votacion.Id}";
                     row++;
                     foreach (var opcion in votacion.OpcionVotacions)
                     {

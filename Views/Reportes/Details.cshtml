@@ -1,4 +1,4 @@
-﻿@model VotingSystem.Models.Reporte
+﻿@model dynamic
 
 @{
     ViewData["Title"] = "Detalle del Reporte";
@@ -6,28 +6,63 @@
 
 <div class="card mt-4">
     <div class="card-header">
-        <h2>Detalle del Reporte</h2>
     </div>
     <div class="card-body">
         <dl class="row">
-            <dt class="col-sm-3">ID</dt>
-            <dd class="col-sm-9">@Model.Id</dd>
-
-            <dt class="col-sm-3">Tipo</dt>
-            <dd class="col-sm-9">@Model.Tipo</dd>
-
-            <dt class="col-sm-3">Título</dt>
-            <dd class="col-sm-9">@Model.Titulo</dd>
-
-            <dt class="col-sm-3">Fecha de Generación</dt>
-            <dd class="col-sm-9">@Model.FechaGeneracion?.ToString("dd/MM/yyyy HH:mm")</dd>
-
-            <dt class="col-sm-3">Generado Por</dt>
+            <dt class="col-sm-3">Creador</dt>
             <dd class="col-sm-9">
-                @Model.GeneradoPorNavigation?.Nombre @Model.GeneradoPorNavigation?.Apellido
+                @Model.Reporte.GeneradoPorNavigation?.Nombre @Model.Reporte.GeneradoPorNavigation?.Apellido
             </dd>
-
+            <dt class="col-sm-3">Reporte de Asamblea</dt>
+            <dd class="col-sm-9">@Model.Asamblea?.Titulo</dd>
+            <dt class="col-sm-3">Fecha</dt>
+            <dd class="col-sm-9">@Model.Asamblea?.Fecha.ToString("dd/MM/yyyy")</dd>
         </dl>
+
+        @if (Model.Votaciones != null)
+        {
+            foreach (var votacion in Model.Votaciones)
+            {
+                <hr />
+                <h5>Votación ID: @votacion.Id</h5>
+                <strong>Título:</strong> @votacion.Titulo
+                <br />
+                @foreach (var opcion in votacion.Opciones)
+                {
+                    <div>
+                        <span><strong>"@opcion.Texto"</strong>: "@opcion.Descripcion"</span>
+                    </div>
+                }
+                <div class="mt-2 mb-2"><strong>Resultados:</strong></div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Opción</th>
+                            <th>Cantidad de votos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var opcion in votacion.Opciones)
+                        {
+                            <tr>
+                                <td>@opcion.Texto</td>
+                                <td>@opcion.CantidadVotos</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        }
+
+        <hr />
+        <h5>Participantes:</h5>
+        <ul>
+            @foreach (var p in Model.Participantes)
+            {
+                <li>@p.Nombre (@p.Email)</li>
+            }
+        </ul>
+
         <a asp-action="Index" class="btn btn-secondary mt-3"><i class="fas fa-arrow-left"></i> Volver a la lista</a>
     </div>
 </div>
