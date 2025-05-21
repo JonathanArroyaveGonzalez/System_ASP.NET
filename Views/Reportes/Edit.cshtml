@@ -1,0 +1,37 @@
+﻿@model VotingSystem.Models.Reporte
+
+@{
+    ViewData["Title"] = "Editar Reporte";
+}
+
+<h2>Editar Reporte</h2>
+
+<form asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Tipo" class="form-label"></label>
+        <input asp-for="Tipo" class="form-control" />
+        <span asp-validation-for="Tipo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Titulo" class="form-label"></label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="UrlArchivo" class="form-label"></label>
+        <input asp-for="UrlArchivo" class="form-control" />
+        <span asp-validation-for="UrlArchivo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Formato" class="form-label"></label>
+        <input asp-for="Formato" class="form-control" />
+        <span asp-validation-for="Formato" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -29,16 +29,20 @@
                 </td>
                 <td>@item.Formato</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm mt-2">
                         <i class="fas fa-eye"></i> Ver
                     </a>
-                    <a asp-action="ExportarPDF" asp-route-asambleaId="@item.Id" class="btn btn-danger btn-sm">
+                    <a asp-action="ExportarPDF" asp-route-asambleaId="@item.Id" class="btn btn-danger btn-sm mt-2">
                         <i class="fas fa-file-pdf"></i> PDF
                     </a>
-                    <a asp-action="GenerarReporteVotacion" asp-route-asambleaId="@item.Id" class="btn btn-primary btn-sm">
+                    <a asp-action="GenerarReporteVotacion" asp-route-asambleaId="@item.Id" class="btn btn-primary btn-sm mt-2">
                         <i class="fas fa-chart-bar"></i> Ver Reporte de Votación
                     </a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning mt-2">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger mt-2">Eliminar</a>
                 </td>
+
+
             </tr>
 
         }
