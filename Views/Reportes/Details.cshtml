@@ -13,10 +13,14 @@
             <dd class="col-sm-9">
                 @Model.Reporte.GeneradoPorNavigation?.Nombre @Model.Reporte.GeneradoPorNavigation?.Apellido
             </dd>
-            <dt class="col-sm-3">Reporte de Asamblea</dt>
-            <dd class="col-sm-9">@Model.Asamblea?.Titulo</dd>
-            <dt class="col-sm-3">Fecha</dt>
-            <dd class="col-sm-9">@Model.Asamblea?.Fecha.ToString("dd/MM/yyyy")</dd>
+            @if (Model.Asamblea != null)
+            {
+                <dt class="col-sm-3">Reporte de Asamblea</dt>
+                <dd class="col-sm-9">@Model.Asamblea.Titulo</dd>
+                <dt class="col-sm-3">Fecha</dt>
+                <dd class="col-sm-9">@Model.Asamblea.Fecha.ToString("dd/MM/yyyy")</dd>
+            }
+
         </dl>
 
         @if (Model.Votaciones != null)
