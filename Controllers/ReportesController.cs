@@ -102,9 +102,6 @@ namespace VotingSystem.Controllers
         }
 
 
-
-
-
         // GET: Reportes/Create
         public IActionResult Create()
         {
@@ -158,7 +155,7 @@ namespace VotingSystem.Controllers
             {
                 return NotFound();
             }
-            return View("~/Views/Reportes/ReporteVotacion.cshtml", reporte);
+            return View("~/Views/Reportes/Edit.cshtml", reporte);
         }
 
         // POST: Reportes/Edit/5
@@ -171,8 +168,18 @@ namespace VotingSystem.Controllers
                 return NotFound();
             }
 
+            ModelState.Remove(nameof(reporte.GeneradoPorNavigation));
+
             if (ModelState.IsValid)
             {
+                var original = _context.Reportes.AsNoTracking().FirstOrDefault(r => r.Id == id);
+                if (original == null)
+                    return NotFound();
+
+                // Mantén el autor y la fecha original
+                reporte.GeneradoPor = original.GeneradoPor;
+                reporte.FechaGeneracion = original.FechaGeneracion;
+
                 try
                 {
                     _context.Update(reporte);
@@ -191,8 +198,10 @@ namespace VotingSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View("~/Views/Reportes/ReporteVotacion.cshtml", reporte);
+            return View("~/Views/Reportes/Edit.cshtml", reporte);
         }
+
+
 
         // GET: Reportes/Delete/5
         public IActionResult Delete(int? id)
@@ -209,7 +218,7 @@ namespace VotingSystem.Controllers
                 return NotFound();
             }
 
-            return View("~/Views/Reportes/ReporteVotacion.cshtml", reporte);
+            return View("~/Views/Reportes/Delete.cshtml", reporte);
         }
 
         // POST: Reportes/Delete/5
