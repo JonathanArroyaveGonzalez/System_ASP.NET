@@ -1,0 +1,86 @@
+﻿@model Votacion
+
+@{
+    ViewData["Title"] = "Agregar Opciones de Votación";
+}
+
+<h1>@ViewData["Title"]</h1>
+<h4>Para votación: @Model.Titulo</h4>
+
+@if (TempData["SuccessMessage"] != null)
+{
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <h5>Opciones existentes</h5>
+
+        @if (Model.OpcionVotacions.Any())
+        {
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Texto</th>
+                            <th>Descripción</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var opcion in Model.OpcionVotacions)
+                    {
+                                <tr>
+                                    <td>@opcion.Texto</td>
+                                    <td>@opcion.Descripcion</td>
+                                    <td>
+                                        <form asp-action="DeleteOption" method="post">
+                                            <input type="hidden" name="id" value="@opcion.Id" />
+                                            <input type="hidden" name="votacionId" value="@Model.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                    }
+                    </tbody>
+                </table>
+        }
+        else
+        {
+                <div class="alert alert-info">
+                    No hay opciones registradas para esta votación.
+                </div>
+        }
+
+        <hr />
+
+        <h5>Agregar nueva opción</h5>
+        <form asp-action="AddOption" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <div class="mb-3">
+                <label for="Texto" class="form-label">Texto de la opción</label>
+                <input type="text" class="form-control" id="Texto" name="Texto" required />
+            </div>
+
+            <div class="mb-3">
+                <label for="Descripcion" class="form-label">Descripción (opcional)</label>
+                <textarea class="form-control" id="Descripcion" name="Descripcion" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Agregar Opción
+                </button>
+                <a asp-controller="Asambleas" asp-action="Details" asp-route-id="@Model.AsambleaId" 
+                   class="btn btn-success">
+                    <i class="fas fa-check"></i> Finalizar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -70,6 +70,14 @@ app.MapControllerRoute(
     defaults: new { controller = "Account", action = "Register" });
 
 app.MapControllerRoute(
+    name: "asambleas",
+    pattern: "Asambleas/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "votaciones",
+    pattern: "Votaciones/{action=Index}/{id?}");
+
+app.MapControllerRoute(
     name: "Reportes",
     pattern: "Reportes",
     defaults: new { controller = "Reportes", action = "Index" });

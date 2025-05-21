@@ -1,8 +1,63 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<Asamblea>
+
+@{
+    ViewData["Title"] = "Calendario de Asambleas";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>@ViewData["Title"]</h1>
+
+<div id="calendar" class="mt-4"></div>
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+        @foreach (var asamblea in Model)
+        {
+            <text>
+                            {
+                                title: '@Html.Raw(asamblea.Titulo)',
+                                start: '@asamblea.Fecha.ToString("yyyy-MM-ddTHH:mm:ss")',
+                                url: '/Asambleas/Details/@asamblea.Id',
+                                color: '@GetCalendarEventColor(asamblea.Estado)'
+                            },
+            </text>
+        }
+                ]
+            });
+
+            calendar.render();
+        });
+    </script>
+}
+
+@functions {
+    public string GetCalendarEventColor(string status)
+    {
+        return status switch
+        {
+            "programada" => "#0d6efd", // Bootstrap primary
+            "en_curso" => "#ffc107",   // Bootstrap warning
+            "finalizada" => "#198754",  // Bootstrap success
+            "cancelada" => "#dc3545",   // Bootstrap danger
+            _ => "#6c757d"             // Bootstrap secondary
+        };
+    }
+}

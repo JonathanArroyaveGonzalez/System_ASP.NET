@@ -20,6 +20,6 @@ public partial class Voto
     public string? IpOrigen { get; set; }
 
     public virtual Usuario Usuario { get; set; } = null!;
-
     public virtual Votacion Votacion { get; set; } = null!;
+    public virtual OpcionVotacion Opcion { get; set; }
 }

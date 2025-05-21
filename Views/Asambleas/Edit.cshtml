@@ -1,7 +1,7 @@
 ﻿@model Asamblea
 
 @{
-    ViewData["Title"] = "Crear Nueva Asamblea";
+    ViewData["Title"] = "Editar Asamblea";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -9,7 +9,9 @@
 <hr />
 <div class="row">
     <div class="col-md-8">
-        <form asp-action="Create">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
@@ -20,7 +22,8 @@
 
             <div class="mb-3">
                 <label asp-for="Fecha" class="form-label"></label>
-                <input asp-for="Fecha" class="form-control" type="datetime-local" />
+                <input asp-for="Fecha" class="form-control" type="datetime-local"
+                       value="@Model.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
                 <span asp-validation-for="Fecha" class="text-danger"></span>
             </div>
 
@@ -31,8 +34,25 @@
             </div>
 
             <div class="mb-3">
+                <label asp-for="Estado" class="form-label"></label>
+                <select asp-for="Estado" class="form-select">
+                    <option value="programada">Programada</option>
+                    <option value="en_curso">En curso</option>
+                    <option value="finalizada">Finalizada</option>
+                    <option value="cancelada">Cancelada</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Acta" class="form-label"></label>
+                <textarea asp-for="Acta" class="form-control" rows="6"></textarea>
+                <span asp-validation-for="Acta" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Crear Asamblea
+                    <i class="fas fa-save"></i> Guardar Cambios
                 </button>
                 <a asp-action="Index" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Volver al listado

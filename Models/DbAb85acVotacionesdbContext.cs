@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-
 namespace VotingSystem.Models;
 
 public partial class DbAb85acVotacionesdbContext : DbContext
@@ -347,6 +346,7 @@ public partial class DbAb85acVotacionesdbContext : DbContext
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Voto__usuario_id__236943A5");
+
 
             entity.HasOne(d => d.Votacion).WithMany(p => p.Votos)
                 .HasForeignKey(d => d.VotacionId)
