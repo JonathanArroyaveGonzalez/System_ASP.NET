@@ -114,16 +114,36 @@ namespace VotingSystem.Controllers
         // POST: Reportes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("Id,Tipo,Titulo,FechaGeneracion,GeneradoPor,UrlArchivo,Formato")] Reporte reporte)
+        public IActionResult Create([Bind("Tipo,Titulo,UrlArchivo,Formato")] Reporte reporte)
         {
+            var email = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+            var identityName = User.Identity?.Name;
+
+            var usuario = _context.Usuarios.FirstOrDefault(u => u.Email == email)
+                       ?? _context.Usuarios.FirstOrDefault(u => u.Nombre == identityName);
+
+            if (usuario == null)
+            {
+                ModelState.AddModelError("", "No se pudo identificar el usuario actual.");
+                return View(reporte);
+            }
+
+            reporte.GeneradoPor = usuario.Id;
+            reporte.FechaGeneracion = DateTime.Now;
+
+            // Elimina la validación de la navegación (para que ModelState sea válido)
+            ModelState.Remove(nameof(reporte.GeneradoPorNavigation));
+
             if (ModelState.IsValid)
             {
                 _context.Add(reporte);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
-            return View("~/Views/Reportes/ReporteVotacion.cshtml", reporte);
+            return View(reporte);
         }
+
+
 
         // GET: Reportes/Edit/5
         public IActionResult Edit(int? id)
@@ -429,6 +449,30 @@ namespace VotingSystem.Controllers
         }
 
 
+        // GET: Reportes/CrearReportePrueba
+        public IActionResult CrearReportePrueba()
+        {
+            // Usa un ID de usuario válido para GeneradoPor
+            var usuarioId = _context.Usuarios.Select(u => u.Id).FirstOrDefault();
+            if (usuarioId == 0)
+                return Content("No hay usuarios en la base de datos.");
+
+            var nuevoReporte = new Reporte
+            {
+                Tipo = "Prueba",
+                Titulo = "Reporte de prueba manual",
+                FechaGeneracion = DateTime.Now,
+                GeneradoPor = usuarioId,
+                UrlArchivo = "prueba.pdf",
+                Formato = "PDF"
+            };
+
+            _context.Reportes.Add(nuevoReporte);
+            _context.SaveChanges();
+
+            return Content($"Reporte creado con ID: {nuevoReporte.Id}");
+        }
 
     }
+
 }

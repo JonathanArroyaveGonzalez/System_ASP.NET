@@ -1,0 +1,49 @@
+﻿@model VotingSystem.Models.Reporte
+
+@{
+    ViewData["Title"] = "Crear Nuevo Reporte";
+    // Obtener el email del usuario autenticado
+    var email = User.Identity?.Name;
+}
+
+<form asp-action="Create" method="post">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="mb-3">
+        <label asp-for="Tipo" class="form-label"></label>
+        <input asp-for="Tipo" class="form-control" />
+        <span asp-validation-for="Tipo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Titulo" class="form-label"></label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="UrlArchivo" class="form-label"></label>
+        <input asp-for="UrlArchivo" class="form-control" />
+        <span asp-validation-for="UrlArchivo" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Formato" class="form-label"></label>
+        <input asp-for="Formato" class="form-control" />
+        <span asp-validation-for="Formato" class="text-danger"></span>
+    </div>
+
+    <!-- Solo visualización, no editable ni enviado al backend -->
+    <div class="mb-3">
+        <label class="form-label">Generado Por</label>
+        <input class="form-control" value="@email" readonly disabled />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Fecha de Generación</label>
+        <input class="form-control" value="@DateTime.Now.ToString("dd/MM/yyyy HH:mm")" readonly disabled />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
