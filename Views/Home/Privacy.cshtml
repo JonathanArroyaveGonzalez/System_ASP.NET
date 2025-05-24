@@ -1,6 +1,26 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Privacidad";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title mb-3 text-primary">Política de Privacidad</h1>
+            <p>
+                La privacidad de los usuarios es fundamental para nuestra plataforma. Toda la información personal y los datos de votación se gestionan bajo estrictos estándares de seguridad y confidencialidad.
+            </p>
+            <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item">Los datos de los usuarios solo se utilizan para la gestión de asambleas y votaciones.</li>
+                <li class="list-group-item">No compartimos información personal con terceros sin consentimiento.</li>
+                <li class="list-group-item">Los resultados de las votaciones son accesibles solo para usuarios autorizados.</li>
+                <li class="list-group-item">Cumplimos con la normativa vigente de protección de datos.</li>
+            </ul>
+            <p>
+                Si tienes dudas o deseas ejercer tus derechos de acceso, rectificación o eliminación de datos, puedes contactarnos a través del formulario de soporte.
+            </p>
+            <p class="text-muted small mb-0">
+                &copy; @DateTime.Now.Year Plataforma de Votaciones para Conjuntos Residenciales
+            </p>
+        </div>
+    </div>
+</div>
