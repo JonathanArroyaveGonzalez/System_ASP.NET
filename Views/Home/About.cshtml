@@ -1,7 +1,45 @@
 ﻿@{
-    ViewData["Title"] = "Acerca de";
+    ViewData["Title"] = "Acerca de:";
 }
-<h1 class="mb-4">Acerca de</h1>
-<div class="card mb-4">
-    <div class="card-body">
-        <h5 class="card-title
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title mb-3 text-primary">Acerca de la Plataforma de Votaciones</h1>
+            <p class="card-text">
+                Nuestra plataforma está diseñada para transformar la gestión de <strong>asambleas</strong> y <strong>votaciones</strong> en conjuntos residenciales, facilitando la participación, la transparencia y la toma de decisiones colectivas.
+            </p>
+            <div class="mb-4">
+                <h5 class="text-secondary">¿Qué servicios ofrecemos?</h5>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item">
+                        <strong>Gestión de Asambleas:</strong>
+                        Organiza, programa y administra asambleas virtuales o presenciales de manera eficiente.<br />
+                        <a asp-controller="AsambleasVotaciones" asp-action="IndexAsambleas" class="btn btn-link p-0">Ver Asambleas</a>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Votaciones en Línea:</strong>
+                        Crea votaciones seguras, permite la participación de los residentes y visualiza los resultados en tiempo real.<br />
+                        <a asp-controller="AsambleasVotaciones" asp-action="IndexVotaciones" class="btn btn-link p-0">Ver Votaciones</a>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Reportes y Resultados:</strong>
+                        Consulta reportes detallados e históricos de todas las votaciones y asambleas realizadas.<br />
+                        <a asp-controller="Reportes" asp-action="Index" class="btn btn-link p-0">Ver Reportes</a>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Histórico de Participación:</strong>
+                        Accede al historial de votaciones y participación de los usuarios.<br />
+                        <a asp-controller="Reportes" asp-action="Historico" class="btn btn-link p-0">Ver Histórico</a>
+                    </li>
+                </ul>
+            </div>
+            <p class="card-text">
+                Nuestro objetivo es brindar una herramienta segura, transparente y fácil de usar para la toma de decisiones en comunidades residenciales, promoviendo la participación activa y la confianza entre los residentes.
+            </p>
+            <p class="text-muted small mb-0">
+                &copy; @DateTime.Now.Year Plataforma de Votaciones para Conjuntos Residenciales
+            </p>
+        </div>
+    </div>
+</div>
