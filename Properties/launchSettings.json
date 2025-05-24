@@ -15,7 +15,8 @@
       "launchBrowser": true,
       "applicationUrl": "http://localhost:5181",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BREVO_API_KEY": "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"
       }
     },
     "https": {
@@ -24,7 +25,8 @@
       "launchBrowser": true,
       "applicationUrl": "https://localhost:7163;http://localhost:5181",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "BREVO_API_KEY": "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"
       }
     },
     "IIS Express": {

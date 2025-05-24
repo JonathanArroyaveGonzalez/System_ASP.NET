@@ -15,14 +15,19 @@ namespace VotingSystem.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly DbAb85acVotacionesdbContext _context; // To fetch user details
-        private const string BrevoApiKey = "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"; // Consider moving to appsettings.json
+        //private const string BrevoApiKey = "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"; // Consider moving to appsettings.json
+        private readonly IConfiguration _configuration;
+        private readonly string BrevoApiKey;
         private const string SenderEmail = "juliancam24708@gmail.com"; // Configure sender email
         private const string SenderName = "Sistema de Votaciones";
 
-        public EmailNotificationController(IHttpClientFactory httpClientFactory, DbAb85acVotacionesdbContext context)
+        public EmailNotificationController(IHttpClientFactory httpClientFactory, DbAb85acVotacionesdbContext context, IConfiguration configuration)
         {
             _httpClientFactory = httpClientFactory;
             _context = context;
+            _configuration = configuration;
+            // Acceder directamente
+            BrevoApiKey = _configuration["BREVO_API_KEY"];
         }
 
         // Private method to handle the actual email sending via Brevo API

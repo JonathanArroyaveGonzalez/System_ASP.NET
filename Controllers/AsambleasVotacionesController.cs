@@ -17,7 +17,6 @@ namespace VotingSystem.Controllers
     public class AsambleasVotacionesController : Controller
     {
         private readonly DbAb85acVotacionesdbContext _context;
-        private const string BrevoApiKey = "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";
         private readonly EmailNotificationController _emailNotificationController; // INJECTED
 
         public AsambleasVotacionesController(DbAb85acVotacionesdbContext context, EmailNotificationController emailNotificationController)
