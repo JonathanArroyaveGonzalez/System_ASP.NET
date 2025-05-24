@@ -1,22 +1,47 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using VotingSystem.Models;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Text;
+using VotingSystem.Models;
 
 [Authorize]
 public class VotacionesController : Controller
 {
     private readonly DbAb85acVotacionesdbContext _context;
+    private readonly IHttpClientFactory _httpClientFactory;
+    private const string BrevoApiKey = "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";
+    private readonly ILogger<VotacionesController> _logger;
 
-    public VotacionesController(DbAb85acVotacionesdbContext context)
+    public VotacionesController(DbAb85acVotacionesdbContext context, IHttpClientFactory httpClientFactory, ILogger<VotacionesController> logger)
     {
         _context = context;
+        _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
 
-    // GET: Votaciones/Create
+    // GET: Votaciones
+    public async Task<IActionResult> Index()
+    {
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        var esAdmin = User.IsInRole("admin");
+
+        var votaciones = await _context.Votacions
+            .Include(v => v.Asamblea)
+            .OrderByDescending(v => v.FechaInicio)
+            .ToListAsync();
+
+        // Marcar si el usuario ya votó en cada votación
+        foreach (var votacion in votaciones)
+        {
+            ViewData[$"YaVoto_{votacion.Id}"] = await _context.Votos
+                .AnyAsync(v => v.VotacionId == votacion.Id && v.UsuarioId == userId);
+        }
+
+        return View(votaciones);
+    }
+
+    // GET: Votaciones/Create con notificacion a usuarios
     [Authorize(Roles = "admin")]
     public IActionResult Create(int asambleaId)
     {
@@ -44,19 +69,73 @@ public class VotacionesController : Controller
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> Create([Bind("AsambleaId,Titulo,Descripcion,FechaInicio,FechaFin,TipoVotacion")] Votacion votacion)
     {
-        if (ModelState.IsValid)
+        // Validar que FechaFin sea mayor que FechaInicio
+        if (votacion.FechaFin <= votacion.FechaInicio)
         {
-            votacion.Estado = "pendiente";
-            _context.Add(votacion);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = "Votación creada exitosamente. Ahora puede agregar opciones.";
-            return RedirectToAction("AddOptions", new { id = votacion.Id });
+            ModelState.AddModelError("FechaFin", "La fecha de fin debe ser posterior a la fecha de inicio");
         }
 
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                votacion.Estado = "pendiente";
+                _context.Add(votacion);
+                await _context.SaveChangesAsync();
+
+                await NotificarNuevaVotacion(votacion);
+
+                TempData["SuccessMessage"] = "Votación creada exitosamente. Ahora puede agregar opciones.";
+                return RedirectToAction("AddOptions", new { id = votacion.Id });
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error al crear votación");
+                ModelState.AddModelError("", "No se pudo crear la votación. Por favor intente nuevamente.");
+            }
+        }
+
+        // Si hay errores, recargar los datos necesarios para la vista
         var asamblea = await _context.Asambleas.FindAsync(votacion.AsambleaId);
         ViewData["AsambleaTitulo"] = asamblea?.Titulo;
         return View(votacion);
+    }
+
+    private async Task NotificarNuevaVotacion(Votacion votacion)
+    {
+        var asamblea = await _context.Asambleas.FindAsync(votacion.AsambleaId);
+        var usuarios = await _context.Usuarios
+            .Where(u => u.Estado == "activo")
+            .Select(u => u.Email)
+            .ToListAsync();
+
+        if (!usuarios.Any())
+            return;
+
+        var client = _httpClientFactory.CreateClient();
+        client.DefaultRequestHeaders.Add("api-key", BrevoApiKey);
+
+        var requestData = new
+        {
+            sender = new { name = "Sistema de Votaciones", email = "no-reply@votaciones.com" },
+            to = usuarios.Select(email => new { email }).ToList(),
+            subject = $"Nueva votación: {votacion.Titulo}",
+            htmlContent = $"<h1>Nueva votación creada</h1>" +
+                         $"<p>Se ha creado una nueva votación en la asamblea '{asamblea?.Titulo}'.</p>" +
+                         $"<h2>{votacion.Titulo}</h2>" +
+                         $"<p>{votacion.Descripcion}</p>" +
+                         $"<p>Fecha de inicio: {votacion.FechaInicio:dd/MM/yyyy HH:mm}</p>" +
+                         $"<p>Fecha de fin: {votacion.FechaFin:dd/MM/yyyy HH:mm}</p>"
+        };
+
+        var response = await client.PostAsync(
+            "https://api.brevo.com/v3/smtp/email",
+            new StringContent(System.Text.Json.JsonSerializer.Serialize(requestData), Encoding.UTF8, "application/json"));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogError($"Error al enviar notificación de nueva votación: {response.StatusCode}");
+        }
     }
 
     // GET: Votaciones/AddOptions/5
@@ -70,6 +149,7 @@ public class VotacionesController : Controller
 
         var votacion = await _context.Votacions
             .Include(v => v.OpcionVotacions)
+            .Include(v => v.Asamblea)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (votacion == null)
@@ -86,7 +166,10 @@ public class VotacionesController : Controller
     [Authorize(Roles = "admin")]
     public async Task<IActionResult> AddOption(int id, [Bind("Texto,Descripcion")] OpcionVotacion opcion)
     {
-        var votacion = await _context.Votacions.FindAsync(id);
+        var votacion = await _context.Votacions
+            .Include(v => v.OpcionVotacions)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
         if (votacion == null)
         {
             return NotFound();
@@ -95,6 +178,7 @@ public class VotacionesController : Controller
         if (ModelState.IsValid)
         {
             opcion.VotacionId = id;
+            opcion.Orden = votacion.OpcionVotacions.Count + 1;
             _context.Add(opcion);
             await _context.SaveChangesAsync();
 
@@ -115,7 +199,7 @@ public class VotacionesController : Controller
 
         var votacion = await _context.Votacions
             .Include(v => v.Asamblea)
-            .Include(v => v.OpcionVotacions)
+            .Include(v => v.OpcionVotacions.OrderBy(o => o.Orden))
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (votacion == null)
@@ -127,6 +211,14 @@ public class VotacionesController : Controller
         var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
         ViewBag.YaVoto = await _context.Votos
             .AnyAsync(v => v.VotacionId == id && v.UsuarioId == usuarioId);
+
+        // Verificar si el usuario tiene restricciones activas
+        var tieneRestriccion = await _context.Restriccions
+            .AnyAsync(r => r.UsuarioId == usuarioId &&
+                    (r.FechaFin == null || r.FechaFin >= DateTime.Now) &&
+                    r.FechaInicio <= DateTime.Now);
+
+        ViewBag.TieneRestriccion = tieneRestriccion;
 
         return View(votacion);
     }
@@ -149,8 +241,22 @@ public class VotacionesController : Controller
             return RedirectToAction(nameof(Details), new { id });
         }
 
-        // Validar que el usuario no haya votado antes
+        // Obtener ID del usuario actual
         var usuarioId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+
+        // Verificar si el usuario tiene restricciones activas
+        var tieneRestriccion = await _context.Restriccions
+            .AnyAsync(r => r.UsuarioId == usuarioId &&
+                    (r.FechaFin == null || r.FechaFin >= DateTime.Now) &&
+                    r.FechaInicio <= DateTime.Now);
+
+        if (tieneRestriccion)
+        {
+            TempData["ErrorMessage"] = "No puede votar debido a restricciones existentes en su cuenta.";
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // Validar que el usuario no haya votado antes
         if (await _context.Votos.AnyAsync(v => v.VotacionId == id && v.UsuarioId == usuarioId))
         {
             TempData["ErrorMessage"] = "Ya has participado en esta votación.";
@@ -183,7 +289,10 @@ public class VotacionesController : Controller
             return NotFound();
         }
 
-        var votacion = await _context.Votacions.FindAsync(id);
+        var votacion = await _context.Votacions
+            .Include(v => v.OpcionVotacions)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
         if (votacion == null)
         {
             return NotFound();
@@ -193,6 +302,13 @@ public class VotacionesController : Controller
         {
             TempData["ErrorMessage"] = "Solo se pueden iniciar votaciones en estado 'pendiente'.";
             return RedirectToAction(nameof(Details), new { id });
+        }
+
+        // Verificar que tenga al menos dos opciones
+        if (votacion.OpcionVotacions.Count < 2)
+        {
+            TempData["ErrorMessage"] = "La votación debe tener al menos dos opciones para poder iniciarla.";
+            return RedirectToAction(nameof(AddOptions), new { id });
         }
 
         votacion.Estado = "en_curso";
@@ -238,6 +354,7 @@ public class VotacionesController : Controller
         // Obtén primero la votación con sus opciones
         var votacion = await _context.Votacions
             .Include(v => v.OpcionVotacions)
+            .Include(v => v.Asamblea)
             .FirstOrDefaultAsync(m => m.Id == id);
 
         if (votacion == null)
@@ -245,20 +362,7 @@ public class VotacionesController : Controller
             return NotFound();
         }
 
-        // Ahora carga los votos manualmente para cada opción
-        foreach (var opcion in votacion.OpcionVotacions)
-        {
-            // Cargar los votos para cada opción
-            var votos = await _context.Votos
-                .Where(v => v.OpcionId == opcion.Id)
-                .Include(v => v.Usuario)  // Incluir usuario si se necesita para votaciones públicas
-                .ToListAsync();
-
-            // Necesitamos agregar los votos a una propiedad en OpcionVotacion
-            // Si no tienes esta propiedad, podemos usar ViewBag para pasarlos a la vista
-        }
-
-        // Pasamos los datos a la vista usando ViewBag si no podemos modificar el modelo
+        // Pasamos los datos a la vista usando ViewBag
         ViewBag.VotosPorOpcion = await _context.Votos
             .Where(v => v.VotacionId == id)
             .GroupBy(v => v.OpcionId)
@@ -270,6 +374,7 @@ public class VotacionesController : Controller
             ViewBag.DetalleVotos = await _context.Votos
                 .Where(v => v.VotacionId == id)
                 .Include(v => v.Usuario)
+                .Include(v => v.Opcion)
                 .ToListAsync();
         }
 

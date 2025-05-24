@@ -9,10 +9,12 @@ using System.Security.Claims;
 public class AsambleasController : Controller
 {
     private readonly DbAb85acVotacionesdbContext _context;
+    private readonly ILogger<AsambleasController> _logger;
 
-    public AsambleasController(DbAb85acVotacionesdbContext context)
+    public AsambleasController(DbAb85acVotacionesdbContext context, ILogger<AsambleasController> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     // GET: Asambleas
@@ -66,6 +68,8 @@ public class AsambleasController : Controller
         {
             return NotFound();
         }
+        
+        ViewBag.CreadorId = asamblea.CreadorId;
         return View(asamblea);
     }
 
@@ -80,22 +84,37 @@ public class AsambleasController : Controller
             return NotFound();
         }
 
+        // Validación adicional
+        if (asamblea.Estado == "finalizada" && string.IsNullOrEmpty(asamblea.Acta))
+        {
+            ModelState.AddModelError("Acta", "Debe incluir un acta cuando la asamblea está finalizada");
+        }
+
         if (ModelState.IsValid)
         {
             try
             {
                 var existingAsamblea = await _context.Asambleas.FindAsync(id);
+                if (existingAsamblea == null)
+                {
+                    return NotFound();
+                }
+
+                // Actualizar propiedades pero mantener CreadorId
                 existingAsamblea.Titulo = asamblea.Titulo;
                 existingAsamblea.Fecha = asamblea.Fecha;
                 existingAsamblea.Descripcion = asamblea.Descripcion;
                 existingAsamblea.Estado = asamblea.Estado;
                 existingAsamblea.Acta = asamblea.Acta;
+                // No cambiar el CreadorId ni FechaCreacion
 
                 _context.Update(existingAsamblea);
                 await _context.SaveChangesAsync();
+
                 TempData["SuccessMessage"] = "Asamblea actualizada exitosamente.";
+                return RedirectToAction(nameof(Index));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!AsambleaExists(asamblea.Id))
                 {
@@ -103,11 +122,17 @@ public class AsambleasController : Controller
                 }
                 else
                 {
-                    throw;
+                    _logger.LogError(ex, "Error de concurrencia al editar asamblea");
+                    ModelState.AddModelError("", "No se pudo guardar los cambios. Por favor intente nuevamente.");
                 }
             }
-            return RedirectToAction(nameof(Index));
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Error al editar asamblea");
+                ModelState.AddModelError("", "No se pudo guardar los cambios. Por favor intente nuevamente.");
+            }
         }
+
         return View(asamblea);
     }
 
@@ -138,6 +163,11 @@ public class AsambleasController : Controller
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
         var asamblea = await _context.Asambleas.FindAsync(id);
+        if (asamblea == null)
+        {
+            return NotFound();
+        }
+        
         _context.Asambleas.Remove(asamblea);
         await _context.SaveChangesAsync();
         TempData["SuccessMessage"] = "Asamblea eliminada exitosamente.";
@@ -180,4 +210,6 @@ public class AsambleasController : Controller
     {
         return _context.Asambleas.Any(e => e.Id == id);
     }
+
+    
 }

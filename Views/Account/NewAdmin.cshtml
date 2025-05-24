@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Promover Usuario a Administrador";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // O tu layout específico para la administración
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h2 class="mb-0 py-2"><i class="fas fa-user-shield me-2"></i>@ViewData["Title"]</h2>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <p class="text-center mb-4">
+                        Seleccione un usuario existente de la lista para asignarle privilegios de administrador.
+                        Solo se muestran usuarios activos que no son administradores actualmente.
+                    </p>
+
+                    @if (TempData["InfoMessage"] != null)
+                    {
+                        <div class="alert alert-info">@TempData["InfoMessage"]</div>
+                    }
+
+                    <form asp-controller="Account" asp-action="PromoteToAdmin" method="post">
+                        @Html.AntiForgeryToken()
+                        
+                        @* Mostrar errores generales del modelo o de lógica de negocio *@
+                        @if (!ViewData.ModelState.IsValid && ViewData.ModelState[string.Empty] != null)
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                <ul class="mb-0">
+                                @foreach (var error in ViewData.ModelState[string.Empty].Errors)
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                                </ul>
+                            </div>
+                        }
+
+                        <div class="form-floating mb-4">
+                            @* El 'name' del select DEBE COINCIDIR con el nombre del parámetro en la acción POST (selectedUserId) *@
+                            <select name="selectedUserId" asp-items="ViewBag.UserList as SelectList" class="form-select form-select-lg" required>
+                                <option value="">-- Seleccione un Usuario --</option>
+                            </select>
+                            <label for="selectedUserId">Usuario a Promover</label>
+                            @Html.ValidationMessage("selectedUserId", "", new { @class = "text-danger small mt-1" })
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Promover a Administrador
+                            </button>
+                            <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Cancelar y Volver al Inicio
+                            </a>
+                        </div>
+                        
+                        @* Enlace opcional a la lista de usuarios si tienes una *@
+                        @if (User.IsInRole("admin")) // Solo mostrar si es admin
+                        {
+                            <div class="mt-4 text-center">
+                                <a asp-action="Index" asp-controller="Usuarios" class="btn btn-sm btn-info">
+                                    <i class="fas fa-users-cog me-1"></i>Gestionar Usuarios
+                                </a>
+                            </div>
+                        }
+                    </form>
+                </div>
+                <div class="card-footer text-center py-3">
+                    <small class="text-muted">Asegúrese de seleccionar el usuario correcto antes de proceder.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

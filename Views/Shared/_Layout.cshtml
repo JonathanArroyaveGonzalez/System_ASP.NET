@@ -14,6 +14,10 @@
     <!--<link rel="stylesheet" href="~/VotingSystem.styles.css" asp-append-version="true" /> -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- En la sección head -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+@RenderSection("Styles", required: false)
 </head>
 <body>
     <header class="main-header">
@@ -38,20 +42,7 @@
                                 </a>
                             </li>
 
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="asambleasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-users me-1"></i> Asambleas
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="asambleasDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Index">Ver Asambleas</a></li>
-                                    @if (User.IsInRole("admin"))
-                                    {
-                                        <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Create">Nueva Asamblea</a></li>
-                                    }
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" asp-controller="Asambleas" asp-action="Calendar">Calendario</a></li>
-                                </ul>
-                            </li>
+                            
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="registrosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-clipboard-list me-1"></i> Registros
@@ -67,11 +58,6 @@
                                             <i class="fas fa-history me-1"></i> Histórico de Votaciones
                                         </a>
                                     </li>
-@*                                     <li>
-                                        <a class="dropdown-item" asp-controller="Reportes" asp-action="GenerarReporteVotacion">
-                                            <i class="fas fa-chart-bar me-1"></i> Reporte de Votación
-                                        </a>
-                                    </li> *@
                                 </ul>
                             </li>
 
@@ -79,12 +65,41 @@
                             @if (User.IsInRole("admin"))
                             {
                                 <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               href="#"
+                               id="asambleasDropdown"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="fas fa-users me-1"></i> Asambleas
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="asambleasDropdown">
+                                <li><a class="dropdown-item" asp-controller="AsambleasVotaciones" asp-action="IndexAsambleas">Ver Asambleas</a></li>
+                                @if (User.IsInRole("admin"))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="AsambleasVotaciones" asp-action="CreateAsamblea">Nueva Asamblea</a></li>
+                                }
+                                </ul>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="votacionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-vote-yea me-1"></i> Votaciones
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="votacionesDropdown">
+                                <li><a class="dropdown-item" asp-controller="AsambleasVotaciones" asp-action="IndexVotaciones">Ver Votaciones</a></li>
+                                @if (User.IsInRole("admin"))
+                                {
+                                    <li><a class="dropdown-item" asp-controller="AsambleasVotaciones" asp-action="CreateVotacion">Nueva Votación</a></li>
+                                }
+                            </ul>
+                        </li>
+                                <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-cog me-1"></i> Administración
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="PromoteToAdmin">Administradores</a></li>
                                         <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Index">Usuarios</a></li>
-                                        <li><a class="dropdown-item" asp-controller="Account" asp-action="CreateAdmin">Nuevo Admin</a></li>
                                         <li><a class="dropdown-item" asp-controller="Restricciones" asp-action="Index">Restricciones</a></li>
                                     </ul>
                                 </li>
@@ -209,3 +224,6 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

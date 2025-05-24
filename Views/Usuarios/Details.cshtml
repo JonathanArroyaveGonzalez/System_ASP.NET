@@ -1,0 +1,77 @@
+﻿@model VotingSystem.Models.Usuario
+
+@{
+    ViewData["Title"] = "Detalles del Usuario";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // O tu layout de administración
+}
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a la Lista de Usuarios
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h2 class="mb-0">@ViewData["Title"]: @Model.NombreCompleto</h2>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">ID de Usuario:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Id)</dd>
+
+                <dt class="col-sm-3">Nombre:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Nombre)</dd>
+
+                <dt class="col-sm-3">Apellido:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Apellido)</dd>
+
+                <dt class="col-sm-3">Correo Electrónico:</dt>
+                <dd class="col-sm-9">@Html.DisplayFor(model => model.Email)</dd>
+
+                <dt class="col-sm-3">Rol:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Rol == "admin")
+                    {
+                        <span class="badge bg-primary">@Model.Rol.ToUpper()</span>
+                    }
+                    else if (Model.Rol == "propietario")
+                    {
+
+                        <span class="badge bg-success">@Model.Rol.ToUpper()</span>
+                    }
+                    else
+                    {
+
+                        <span class="badge bg-secondary">@Model.Rol.ToUpper()</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Estado:</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Estado == "activo")
+                    {
+                        <span class="badge bg-success">@Model.Estado.ToUpper()</span>
+                    }
+                    else
+                    {
+
+                        <span class="badge bg-danger">@Model.Estado.ToUpper()</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Fecha de Registro:</dt>
+                <dd class="col-sm-9">@(Model.FechaRegistro.HasValue? Model.FechaRegistro.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</dd>
+
+                <dt class="col-sm-3">Último Acceso:</dt>
+                <dd class="col-sm-9">@(Model.UltimoAcceso.HasValue? Model.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</dd>
+            </dl>
+        </div>
+        <div class="card-footer text-end">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="fas fa-edit me-2"></i>Editar Usuario
+            </a>
+        </div>
+    </div>
+</div>

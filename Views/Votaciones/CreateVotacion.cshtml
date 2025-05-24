@@ -1,0 +1,231 @@
+﻿@model VotingSystem.Models.Votacion
+@{
+    ViewData["Title"] = "Crear Votación";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="CreateVotacion" id="votacionForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Titulo" class="control-label"></label>
+                <input asp-for="Titulo" class="form-control" />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="TipoVotacion" class="control-label">Tipo de Votación</label>
+                        <select asp-for="TipoVotacion" class="form-control">
+                            <option value="">Seleccione un tipo</option>
+                            <option value="simple">Votación Simple (Sí/No)</option>
+                            <option value="multiple">Votación Múltiple</option>
+                            <option value="secreta">Votación Secreta</option>
+                            <option value="publica">Votación Pública</option>
+                        </select>
+                        <span asp-validation-for="TipoVotacion" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="Estado" class="control-label"></label>
+                        <select asp-for="Estado" class="form-control">
+                            <option value="">Seleccione un estado</option>
+                            <option value="programada">Programada</option>
+                            <option value="en_curso">En Curso</option>
+                            <option value="finalizada">Finalizada</option>
+                            <option value="cancelada">Cancelada</option>
+                        </select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="FechaInicio" class="control-label">Fecha de Inicio</label>
+                        <input asp-for="FechaInicio" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="FechaFin" class="control-label">Fecha de Fin</label>
+                        <input asp-for="FechaFin" class="form-control" type="datetime-local" />
+                        <span asp-validation-for="FechaFin" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="QuorumRequerido" class="control-label">Quórum Requerido (%)</label>
+                        <input asp-for="QuorumRequerido" class="form-control" type="number" step="0.01" min="0.01" max="9.99" placeholder="Ej: 5.50" />
+                        <span asp-validation-for="QuorumRequerido" class="text-danger"></span>
+                        <small class="form-text text-muted">Porcentaje de participación mínima requerida (máx. 9.99)</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label asp-for="AsambleaId" class="control-label">Asamblea</label>
+                        <select asp-for="AsambleaId" class="form-control" asp-items="ViewBag.AsambleaId">
+                            <option value="">Seleccione una asamblea</option>
+                        </select>
+                        <span asp-validation-for="AsambleaId" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr />
+            <h4>Opciones de Votación</h4>
+            <div id="opciones-container">
+                <!-- Las opciones se generarán dinámicamente -->
+            </div>
+
+            <div class="form-group">
+                <button type="button" class="btn btn-success btn-sm" onclick="agregarOpcion()">
+                    <i class="fas fa-plus"></i> Agregar Opción
+                </button>
+            </div>
+
+            <hr />
+            <div class="form-group">
+                <input type="submit" value="Crear Votación" class="btn btn-primary" />
+                <a asp-action="IndexVotaciones" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        let contadorOpciones = 0;
+
+        // Inicializar con 2 opciones por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            agregarOpcion();
+            agregarOpcion();
+        });
+
+        function agregarOpcion() {
+            const container = document.getElementById('opciones-container');
+            const opcionHtml = `
+                <div class="opcion-item border rounded p-3 mb-3" data-opcion="${contadorOpciones}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="OpcionTexto_${contadorOpciones}">Texto de la Opción *</label>
+                                <input type="text"
+                                       name="OpcionTexto"
+                                       id="OpcionTexto_${contadorOpciones}"
+                                       class="form-control"
+                                       placeholder="Ej: Sí, No, A favor, En contra..."
+                                       required />
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="OpcionDescripcion_${contadorOpciones}">Descripción (Opcional)</label>
+                                <input type="text"
+                                       name="OpcionDescripcion"
+                                       id="OpcionDescripcion_${contadorOpciones}"
+                                       class="form-control"
+                                       placeholder="Descripción adicional..." />
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button type="button"
+                                        class="btn btn-danger btn-sm form-control"
+                                        onclick="eliminarOpcion(this)"
+                                        title="Eliminar opción">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', opcionHtml);
+            contadorOpciones++;
+
+            // Actualizar numeración visual
+            actualizarNumeracion();
+        }
+
+        function eliminarOpcion(button) {
+            const opcionItem = button.closest('.opcion-item');
+            const totalOpciones = document.querySelectorAll('.opcion-item').length;
+
+            // No permitir eliminar si solo quedan 2 opciones
+            if (totalOpciones <= 2) {
+                alert('Debe mantener al menos 2 opciones de votación');
+                return;
+            }
+
+            opcionItem.remove();
+            actualizarNumeracion();
+        }
+
+        function actualizarNumeracion() {
+            const opciones = document.querySelectorAll('.opcion-item');
+            opciones.forEach((opcion, index) => {
+                const label = opcion.querySelector('label[for^="OpcionTexto"]');
+                if (label) {
+                    label.textContent = `Opción ${index + 1} *`;
+                }
+            });
+        }
+
+        // Validación antes de enviar
+        document.getElementById('votacionForm').addEventListener('submit', function(e) {
+            const opciones = document.querySelectorAll('input[name="OpcionTexto"]');
+            let opcionesValidas = 0;
+
+            opciones.forEach(opcion => {
+                if (opcion.value.trim() !== '') {
+                    opcionesValidas++;
+                }
+            });
+
+            if (opcionesValidas < 2) {
+                e.preventDefault();
+                alert('Debe agregar al menos 2 opciones de votación válidas');
+                return false;
+            }
+        });
+    </script>
+
+    <style>
+        .opcion-item {
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+            .opcion-item:hover {
+                background-color: #e9ecef;
+            }
+
+        #opciones-container {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+    </style>
+}

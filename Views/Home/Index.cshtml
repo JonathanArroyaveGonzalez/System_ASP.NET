@@ -1,8 +1,180 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.Security.Claims
+@using VotingSystem.Models 
+
+@{
+    var votacionesHabilitadas = ViewBag.VotacionesHabilitadas as List<Votacion>;
+    var votacionesProgramadas = ViewBag.VotacionesProgramadas as List<Votacion>;
+    var asambleas = ViewBag.Asambleas as List<Asamblea>;
+    bool esAdmin = ViewBag.EsAdmin ?? false;
+    // bool tieneRestriccion = ViewBag.TieneRestriccion ?? false; // El controlador redirige si hay restricción.
+    // Este ViewBag es más para lógica interna del controlador si fuera necesario.
+    string nombreUsuario = ViewBag.NombreUsuario ?? "Usuario";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+
+    @* Mensajes de TempData (útiles si se redirige a esta página con mensajes) *@
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["InfoMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            @TempData["InfoMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @* El TempData["ErrorMessage"] por restricción se mostrará en la página de Login (Account/Index) después de la redirección *@
+
+
+    <div class="jumbotron bg-light p-4 p-md-5 rounded-3 mb-4 shadow-sm">
+        <h1 class="display-5 fw-bold">¡Bienvenido(a), @nombreUsuario!</h1>
+        <p class="col-md-10 fs-5">
+            Este es el portal del Sistema de Votaciones. Aquí podrás participar en las votaciones activas,
+            consultar resultados y gestionar asambleas y votaciones si eres administrador.
+        </p>
+        <hr class="my-4">
+        <p>Utilice el menú de navegación para acceder a las diferentes secciones del sistema.</p>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow border-left-primary">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="m-0 fw-bold"><i class="fas fa-vote-yea me-2"></i>Votaciones Disponibles para Participar</h4>
+                </div>
+                <div class="card-body">
+                    @if (votacionesHabilitadas != null && votacionesHabilitadas.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var votacion in votacionesHabilitadas)
+                            {
+                                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 p-3 rounded shadow-hover">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1 text-primary"><strong>@votacion.Titulo</strong></h5>
+                                        <span class="badge bg-success rounded-pill align-self-start">Activa</span>
+                                    </div>
+                                    <p class="mb-1">@votacion.Descripcion</p>
+                                    <small class="text-muted d-block mb-2">
+                                        Asamblea: @(votacion.Asamblea?.Titulo ?? "N/A") | Tipo: @votacion.TipoVotacion
+                                    </small>
+                                    <small class="text-danger fw-bold d-block">
+                                        <i class="far fa-clock"></i> Finaliza el: @votacion.FechaFin.ToString("dd 'de' MMMM 'de' yyyy, HH:mm 'hrs'")
+                                    </small>
+                                    <div class="mt-3">
+                                        @* Enlace para ir a la página de votación específica *@
+                                        <a href="@Url.Action("UserVoting", "AsambleasVotaciones", new { votacionId = votacion.Id })" class="btn btn-success btn-sm">
+                                            <i class="fas fa-person-booth me-1"></i> Participar Ahora
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info text-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> No hay votaciones activas disponibles para usted en este momento.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow border-left-info">
+                <div class="card-header bg-info text-white py-3">
+                    <h4 class="m-0 fw-bold"><i class="fas fa-calendar-alt me-2"></i>Próximas Votaciones Programadas</h4>
+                </div>
+                <div class="card-body">
+                    @if (votacionesProgramadas != null && votacionesProgramadas.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var votacion in votacionesProgramadas)
+                            {
+                                <div class="list-group-item mb-3 p-3 rounded shadow-hover">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@votacion.Titulo</h5>
+                                        <span class="badge bg-warning text-dark rounded-pill align-self-start">@votacion.Estado</span>
+                                    </div>
+                                    <p class="mb-1">@votacion.Descripcion</p>
+                                    <small class="text-muted d-block">Asamblea: @(votacion.Asamblea?.Titulo ?? "N/A")</small>
+                                    <small class="text-primary fw-bold d-block">
+                                        <i class="far fa-calendar-check"></i> Inicia el: @votacion.FechaInicio.ToString("dd 'de' MMMM 'de' yyyy, HH:mm 'hrs'")
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-light text-center" role="alert">
+                            <i class="fas fa-calendar-times me-2"></i> No hay votaciones programadas para mostrar.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (asambleas != null && asambleas.Any())
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow border-left-secondary">
+                    <div class="card-header bg-secondary text-white py-3">
+                        <h4 class="m-0 fw-bold"><i class="fas fa-users me-2"></i>Asambleas Próximas o en Curso</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            @foreach (var asamblea in asambleas)
+                            {
+                                <div class="list-group-item mb-3 p-3 rounded shadow-hover">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@asamblea.Titulo</h5>
+                                        <span class="badge bg-light text-dark rounded-pill align-self-start">@asamblea.Estado</span>
+                                    </div>
+                                    <p class="mb-1">@asamblea.Descripcion</p>
+                                    <small class="text-muted d-block">
+                                        <i class="far fa-calendar-alt"></i> Fecha: @asamblea.Fecha.ToString("dd 'de' MMMM 'de' yyyy")
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@section Styles {
+    <style>
+        .border-left-primary { border-left: .25rem solid #4e73df !important; }
+        .border-left-success { border-left: .25rem solid #1cc88a !important; }
+        .border-left-info   { border-left: .25rem solid #36b9cc !important; }
+        .border-left-warning { border-left: .25rem solid #f6c23e !important; }
+        .border-left-danger  { border-left: .25rem solid #e74a3b !important; }
+        .border-left-secondary { border-left: .25rem solid #858796 !important; }
+
+        .shadow-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+            transition: transform .2s ease-in-out, box-shadow .2s ease-in-out;
+        }
+        .jumbotron {
+             background-image: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(245,247,250,0.85) 70%, rgba(230,235,240,0.8) 100%), url('https://www.transparenttextures.com/patterns/concrete-wall-2.png');
+             background-size: auto, auto;
+        }
+        .card-header .fas, .card-header .far { /* Iconos en los headers de las tarjetas */
+            font-size: 1.1em;
+        }
+    </style>
+}
+

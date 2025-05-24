@@ -1,0 +1,83 @@
+@model VotingSystem.Models.Restriccion
+
+@{
+    ViewData["Title"] = "Nueva Restricción";
+    Layout = "~/Views/Shared/_Layout.cshtml"; 
+}
+
+<div class="container mt-4">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">@ViewData["Title"]</h2>
+        </div>
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <select asp-for="UsuarioId" class="form-select" asp-items="@(ViewData["UsuarioId"] as SelectList)">
+                                <option value="">-- Seleccione un Usuario --</option>
+                            </select>
+                            <label asp-for="UsuarioId" class="control-label">Usuario a Restringir</label>
+                            <span asp-validation-for="UsuarioId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <select asp-for="TipoRestriccion" class="form-select" asp-items="@(ViewData["TiposRestriccionList"] as SelectList)">
+                                <option value="">-- Seleccione un Tipo de Restricción --</option>
+                            </select>
+                            <label asp-for="TipoRestriccion" class="control-label"></label>
+                            <span asp-validation-for="TipoRestriccion" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="FechaInicio" class="form-control" type="datetime-local" />
+                            <label asp-for="FechaInicio" class="control-label">Fecha y Hora de Inicio</label>
+                            <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="FechaFin" class="form-control" type="datetime-local" />
+                            <label asp-for="FechaFin" class="control-label">Fecha y Hora de Fin (Opcional)</label>
+                            <span asp-validation-for="FechaFin" class="text-danger"></span>
+                            <small class="form-text text-muted">Deje en blanco si la restricción es indefinida.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <textarea asp-for="Motivo" class="form-control" placeholder="Explique el motivo de la restricción..." style="height: 100px"></textarea>
+                    <label asp-for="Motivo" class="control-label"></label>
+                    <span asp-validation-for="Motivo" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Crear Restricción
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,102 @@
+﻿@model VotingSystem.Models.Votacion
+
+@{
+    ViewData["Title"] = "Editar Votación";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // O tu layout principal
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">@ViewData["Title"]</h1>
+        </div>
+        <div class="card-body">
+            <form asp-action="EditVotacion" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="Id" />
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="Titulo" class="form-control" placeholder="Título de la Votación" />
+                            <label asp-for="Titulo" class="control-label"></label>
+                            <span asp-validation-for="Titulo" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <select asp-for="AsambleaId" class="form-select" asp-items="ViewBag.AsambleaIdList">
+                                <option value="">-- Seleccione una Asamblea --</option>
+                            </select>
+                            <label asp-for="AsambleaId" class="control-label">Asamblea</label>
+                            <span asp-validation-for="AsambleaId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <textarea asp-for="Descripcion" class="form-control" placeholder="Descripción detallada" style="height: 100px"></textarea>
+                    <label asp-for="Descripcion" class="control-label"></label>
+                    <span asp-validation-for="Descripcion" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="TipoVotacion" class="form-control" placeholder="Ej: Mayoría Simple, 2/3 Partes" />
+                            <label asp-for="TipoVotacion" class="control-label"></label>
+                            <span asp-validation-for="TipoVotacion" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="QuorumRequerido" type="number" class="form-control" placeholder="Ej: 51" />
+                            <label asp-for="QuorumRequerido" class="control-label">Quórum Requerido (%)</label>
+                            <span asp-validation-for="QuorumRequerido" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="FechaInicio" class="form-control" type="datetime-local" />
+                            <label asp-for="FechaInicio" class="control-label"></label>
+                            <span asp-validation-for="FechaInicio" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            <input asp-for="FechaFin" class="form-control" type="datetime-local" />
+                            <label asp-for="FechaFin" class="control-label"></label>
+                            <span asp-validation-for="FechaFin" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <select asp-for="Estado" class="form-select" asp-items="ViewBag.EstadoList">
+                        <option value="">-- Seleccione un Estado --</option>
+                    </select>
+                    <label asp-for="Estado" class="control-label"></label>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-end mt-4">
+                    <a asp-action="IndexVotaciones" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </a>
+                    <button type="submit" value="Guardar" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

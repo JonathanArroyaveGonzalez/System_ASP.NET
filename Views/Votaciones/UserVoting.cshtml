@@ -1,0 +1,83 @@
+﻿@model VotingSystem.Models.Votacion
+@{
+    ViewData["Title"] = $"Votar: {Model.Titulo}";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // O tu layout principal
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="card-title mb-0">🗳️ @ViewData["Title"]</h2>
+        </div>
+        <div class="card-body">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+            @if (TempData["InfoMessage"] != null)
+            {
+                <div class="alert alert-info">@TempData["InfoMessage"]</div>
+            }
+
+            <p class="lead"><strong>Asamblea:</strong> @(Model.Asamblea?.Titulo ?? "N/A")</p>
+            <p>@Model.Descripcion</p>
+            <hr />
+
+            @if (Model.OpcionVotacions != null && Model.OpcionVotacions.Any())
+            {
+                <form asp-action="RegistrarVoto" asp-controller="AsambleasVotaciones" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="votacionId" value="@Model.Id" />
+
+                    <fieldset class="mb-3">
+                        <legend class="h5">Seleccione una opción:</legend>
+                        @foreach (var opcion in Model.OpcionVotacions.OrderBy(o => o.Orden))
+                        {
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="radio" name="opcionId" id="opcion-@opcion.Id" value="@opcion.Id" required>
+                                <label class="form-check-label" for="opcion-@opcion.Id">
+                                    <strong>@opcion.Texto</strong>
+                                    @if (!string.IsNullOrWhiteSpace(opcion.Descripcion))
+                                    {
+                                        <small class="d-block text-muted">(@opcion.Descripcion)</small>
+                                    }
+                                </label>
+                            </div>
+                        }
+                    </fieldset>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="fas fa-check-to-slot me-2"></i>Registrar mi Voto
+                        </button>
+                        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <div class="alert alert-warning">Esta votación no tiene opciones configuradas.</div>
+                <a asp-action="Index" asp-controller="Home" class="btn btn-outline-secondary mt-3">
+                    <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                </a>
+            }
+        </div>
+        <div class="card-footer text-muted">
+            Esta votación estará activa desde @Model.FechaInicio.ToString("dd/MM/yyyy HH:mm") hasta @Model.FechaFin.ToString("dd/MM/yyyy HH:mm").
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card-title {
+            font-size: 1.75rem;
+        }
+
+        .form-check-label strong {
+            font-size: 1.1rem;
+        }
+    </style>
+}

@@ -1,0 +1,56 @@
+﻿@model VotingSystem.Models.Votacion
+
+@{
+    ViewData["Title"] = "Eliminar Votación";
+}
+
+
+<h3>¿Está seguro que desea eliminar esta votación?</h3>
+<div>
+    <h4>Votación</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Titulo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Titulo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Descripcion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Descripcion)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.TipoVotacion)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.TipoVotacion)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FechaInicio)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FechaInicio)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FechaFin)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FechaFin)
+        </dd>
+        <dt class="col-sm-2">
+            Asamblea
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Asamblea.Titulo)
+        </dd>
+    </dl>
+
+    <form asp-action="DeleteVotacion">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
+        <a asp-action="IndexVotaciones" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>

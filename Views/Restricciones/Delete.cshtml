@@ -1,0 +1,84 @@
+@model VotingSystem.Models.Restriccion
+
+@{
+    ViewData["Title"] = "Eliminar Restricción";
+}
+
+<div class="container">
+    <div class="mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a la lista
+        </a>
+    </div>
+    
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h2>@ViewData["Title"]</h2>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>¿Está seguro de que desea eliminar esta restricción?</strong>
+                <p>Esta acción no se puede deshacer.</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Usuario:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.Usuario.NombreCompleto)</dd>
+
+                        <dt class="col-sm-4">Tipo de restricción:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge @GetBadgeClass(Model.TipoRestriccion)">
+                                @Html.DisplayFor(model => model.TipoRestriccion)
+                            </span>
+                        </dd>
+
+                        <dt class="col-sm-4">Fecha de inicio:</dt>
+                        <dd class="col-sm-8">@Model.FechaInicio.ToString("dd/MM/yyyy")</dd>
+
+                        <dt class="col-sm-4">Fecha de fin:</dt>
+                        <dd class="col-sm-8">@(Model.FechaFin?.ToString("dd/MM/yyyy") ?? "Indefinido")</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6">
+                    <dl class="row">
+                        <dt class="col-sm-4">Creada por:</dt>
+                        <dd class="col-sm-8">@Html.DisplayFor(model => model.CreadoPorNavigation.NombreCompleto)</dd>
+                    </dl>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h5>Motivo de la restricción:</h5>
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <p>@(string.IsNullOrEmpty(Model.Motivo) ? "No se proporcionó motivo" : Model.Motivo)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-2"></i>Confirmar eliminación
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetBadgeClass(string tipo)
+    {
+        return tipo switch
+        {
+            "Morosidad" => "bg-danger",
+            "Incumplimiento" => "bg-warning text-dark",
+            "Suspensión temporal" => "bg-info",
+            _ => "bg-secondary"
+        };
+    }
+}

@@ -1,0 +1,68 @@
+﻿@model VotingSystem.Models.Asamblea
+@{
+    ViewData["Title"] = "Crear Asamblea";
+}
+
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="CreateAsamblea">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Titulo" class="control-label"></label>
+                <input asp-for="Titulo" class="form-control" />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Descripcion" class="control-label"></label>
+                <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Descripcion" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Fecha" class="control-label"></label>
+                <input asp-for="Fecha" class="form-control" type="datetime-local" />
+                <span asp-validation-for="Fecha" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Estado" class="control-label"></label>
+                <select asp-for="Estado" class="form-control">
+                    <option value="">Seleccione un estado</option>
+                    <option value="programada">Programada</option>
+                    <option value="en_curso">En curso</option>
+                    <option value="finalizada">Finalizada</option>
+                    <option value="cancelada">Cancelada</option>
+                </select>
+                <span asp-validation-for="Estado" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CreadorId" class="control-label">Creador</label>
+                <select asp-for="CreadorId" class="form-control" asp-items="ViewBag.CreadorId">
+                    <option value="">Seleccione un creador</option>
+                </select>
+                <span asp-validation-for="CreadorId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Acta" class="control-label"></label>
+                <textarea asp-for="Acta" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Acta" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Crear" class="btn btn-primary" />
+                <a asp-action="IndexAsambleas" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using VotingSystem.Controllers;
 using VotingSystem.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient();
+
+// Register the EmailNotificationController
+builder.Services.AddScoped<EmailNotificationController>();
 
 builder.Services.AddDbContext<DbAb85acVotacionesdbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MiConexion")));
@@ -18,13 +22,14 @@ builder.Services.AddDbContext<DbAb85acVotacionesdbContext>(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
-        options.LoginPath = "/login";
-        options.LogoutPath = "/logout";
+        options.LoginPath = "/Account";
+        options.LogoutPath = "/Account/logout";
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
         options.SlidingExpiration = true;
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        //options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.Cookie.SameSite = SameSiteMode.Strict;
     });
 
@@ -35,7 +40,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Authenticated", policy => policy.RequireAuthenticatedUser());
 });
 
+
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -69,13 +77,7 @@ app.MapControllerRoute(
     pattern: "register",
     defaults: new { controller = "Account", action = "Register" });
 
-app.MapControllerRoute(
-    name: "asambleas",
-    pattern: "Asambleas/{action=Index}/{id?}");
 
-app.MapControllerRoute(
-    name: "votaciones",
-    pattern: "Votaciones/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "Reportes",

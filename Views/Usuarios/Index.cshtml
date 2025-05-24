@@ -1,0 +1,172 @@
+﻿@model PaginatedList<VotingSystem.Models.Usuario>
+
+@{
+    ViewData["Title"] = "Gestión de Usuarios";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // O tu layout de admin
+}
+
+<div class="container mt-4">
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 class="mb-0">Opciones de Administración</h5>
+                </div>
+                <div class="col-md-6">
+                    <form asp-action="Index" method="get" class="d-flex">
+                        <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control form-control-sm me-2" placeholder="Buscar..." />
+                        <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <a asp-controller="Account" asp-action="PromoteToAdmin" class="btn btn-info">
+                <i class="fas fa-user-shield"></i> Promover Usuario a Admin
+            </a>
+        </div>
+    </div>
+
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                            Nombre Completo <i class="fas fa-sort"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["EmailSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                            Email <i class="fas fa-sort"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["RoleSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                            Rol <i class="fas fa-sort"></i>
+                        </a>
+                    </th>
+                    <th>
+                        <a asp-action="Index" asp-route-sortOrder="@ViewData["StatusSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]">
+                            Estado <i class="fas fa-sort"></i>
+                        </a>
+                    </th>
+                    <th>Último Acceso</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center">No se encontraron usuarios.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.NombreCompleto)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Email)</td>
+                            <td>
+                                @if (item.Rol == "admin")
+                                {
+                                    <span class="badge bg-primary">@item.Rol.ToUpper()</span>
+                                }
+                                else if (item.Rol == "propietario")
+                                {
+
+                                    <span class="badge bg-success">@item.Rol.ToUpper()</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-secondary">@item.Rol.ToUpper()</span>
+                                }
+                            </td>
+                            <td>
+                                @if (item.Estado == "activo")
+                                {
+                                    <span class="badge bg-success">@item.Estado.ToUpper()</span>
+                                }
+                                else
+                                {
+
+                                    <span class="badge bg-danger">@item.Estado.ToUpper()</span>
+                                }
+                            </td>
+                            <td>@(item.UltimoAcceso.HasValue? item.UltimoAcceso.Value.ToString("dd/MM/yyyy HH:mm") : "N/A")</td>
+                            <td class="text-center">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning me-1" title="Editar Usuario">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Ver Detalles">
+                                    <i class="fas fa-info-circle"></i>
+                                </a>
+                                @* Podrías añadir un botón para gestionar restricciones del usuario aquí *@
+                                <a asp-controller="Restricciones" asp-action="Create" asp-route-usuarioId="@item.Id" class="btn btn-sm btn-danger ms-1" title="Añadir Restricción">
+                                    <i class="fas fa-user-lock"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @{
+        var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+        var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+    }
+
+    <nav aria-label="Navegación de usuarios" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @prevDisabled">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="page-link">Anterior</a>
+            </li>
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a asp-action="Index"
+                       asp-route-sortOrder="@ViewData["CurrentSort"]"
+                       asp-route-pageNumber="@i"
+                       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                       class="page-link">@i</a>
+                </li>
+            }
+            <li class="page-item @nextDisabled">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="page-link">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="text-center mt-2">
+        <small>Página @Model.PageIndex de @Model.TotalPages (Total: @Model.TotalCount usuarios)</small>
+    </div>
+</div>

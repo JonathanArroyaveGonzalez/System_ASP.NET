@@ -1,0 +1,41 @@
+﻿@model IEnumerable<VotingSystem.Models.Votacion>
+
+@{
+    ViewData["Title"] = "Votaciones";
+}
+
+
+
+<p>
+    <a asp-action="CreateVotacion" class="btn btn-primary">Crear Nueva Votación</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Asamblea</th>
+            <th>Tipo</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Titulo)</td>
+                <td>@Html.DisplayFor(modelItem => item.Asamblea.Titulo)</td>
+                <td>@Html.DisplayFor(modelItem => item.TipoVotacion)</td>
+                <td>@Html.DisplayFor(modelItem => item.FechaInicio)</td>
+                <td>@Html.DisplayFor(modelItem => item.FechaFin)</td>
+                <td>@Html.DisplayFor(modelItem => item.Estado)</td>
+                <td>
+                    <a asp-action="EditVotacion" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="DeleteVotacion" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

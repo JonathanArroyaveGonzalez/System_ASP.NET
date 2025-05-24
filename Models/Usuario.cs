@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace VotingSystem.Models;
 
@@ -34,4 +35,12 @@ public partial class Usuario
     public virtual ICollection<Restriccion> RestriccionUsuarios { get; set; } = new List<Restriccion>();
 
     public virtual ICollection<Voto> Votos { get; set; } = new List<Voto>();
+
+    // Propiedades adicionales
+    public string NombreCompleto => $"{Nombre} {Apellido}";
+
+    public bool TieneRestriccionActiva(DateTime fecha)
+    {
+        return RestriccionUsuarios.Any(r => r.FechaInicio <= fecha && (r.FechaFin == null || r.FechaFin >= fecha));
+    }
 }

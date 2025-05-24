@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VotingSystem.Models;
 
-public partial class OpcionVotacion
+/**public partial class OpcionVotacion
 {
     public int Id { get; set; }
 
@@ -17,3 +17,4 @@ public partial class OpcionVotacion
 
     public virtual Votacion Votacion { get; set; } = null!;
 }
+*/
