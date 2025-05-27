@@ -1,5 +1,5 @@
 # Sistema de Votaciones para Asambleas de Propiedad Horizontal 
-
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/JonathanArroyaveGonzalez/System_ASP.NET)
 ## Tabla de Contenido
 1. [Descripción del Proyecto](#descripcion-del-proyecto)
 2. [Diagrama Entidad-Relación](#diagrama-entidad-relacion)
