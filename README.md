@@ -17,11 +17,11 @@ El Sistema de Votaciones para Asambleas de Propiedad Horizontal es una aplicaci�
 
 ## Diagrama Entidad-Relación
 
-![Diagrama Entidad-Relación](https://raw.githubusercontent.com/JonathanArroyaveGonzalez/System_ASP.NET/refs/heads/main/wwwroot/assets/ER_diagram.png)
+![Diagrama Entidad-Relación](https://i.postimg.cc/1tHW2Yzz/image.png)
 
 ## Diagrama de Casos de Uso
 
-![Diagrama de Casos de Uso](https://github.com/JonathanArroyaveGonzalez/System_ASP.NET/blob/main/wwwroot/assets/useCase_Diagram.png?raw=true)
+![Diagrama de Casos de Uso](https://i.postimg.cc/NGbX2vVM/usecases.png)
 
 ## Especificación de Requisitos
 
@@ -36,14 +36,12 @@ El Sistema de Votaciones para Asambleas de Propiedad Horizontal es una aplicaci�
 | RF05 | Gestión de Asambleas | Definición de agenda | Crear y gestionar la agenda y puntos a votar en cada asamblea |
 | RF06 | Sistema de Votaciones | Creación de votaciones | Permitir la creación de votaciones con múltiples opciones de respuesta |
 | RF07 | Sistema de Votaciones | Configuración de duración | Establecer la duración de las votaciones |
-| RF08 | Sistema de Votaciones | Registro de votos ponderados | Permitir el registro de votos con ponderación según coeficiente de propiedad |
-| RF09 | Sistema de Votaciones | Cierre automático | Cerrar automáticamente las votaciones según el tiempo establecido |
-| RF10 | Notificaciones | Envío de correos | Enviar automáticamente correos electrónicos para informar sobre nuevas votaciones |
-| RF11 | Notificaciones | Alertas de resultados | Notificar sobre los resultados de las votaciones |
-| RF12 | Reportes y Visualización | Generación de reportes | Crear reportes detallados de las votaciones realizadas |
-| RF13 | Reportes y Visualización | Visualización gráfica | Presentar resultados mediante gráficos (barras, circulares) |
-| RF14 | Reportes y Visualización | Exportación de reportes | Permitir la exportación de reportes en formatos PDF y Excel |
-| RF15 | Reportes y Visualización | Histórico de votaciones | Mantener un registro histórico de votaciones por asamblea y por usuario |
+| RF08 | Sistema de Votaciones | Cierre automático | Cerrar automáticamente las votaciones según el tiempo establecido |
+| RF9 | Notificaciones | Envío de correos | Enviar automáticamente correos electrónicos para informar sobre nuevas votaciones |
+| RF10 | Reportes y Visualización | Generación de reportes | Crear reportes detallados de las votaciones realizadas |
+| RF11 | Reportes y Visualización | Visualización gráfica | Presentar resultados mediante gráficos (barras, circulares) |
+| RF12 | Reportes y Visualización | Exportación de reportes | Permitir la exportación de reportes en formatos PDF y Excel |
+| RF13 | Reportes y Visualización | Histórico de votaciones | Mantener un registro histórico de votaciones por asamblea y por usuario |
 
 ### Requisitos No Funcionales
 
@@ -53,8 +51,6 @@ El Sistema de Votaciones para Asambleas de Propiedad Horizontal es una aplicaci�
 | RNF02 | Escalabilidad | Diseño modular | Implementación modular para facilitar extensiones del sistema |
 | RNF03 | Usabilidad | Interfaz intuitiva | Desarrollo de una interfaz de usuario intuitiva y responsiva |
 | RNF04 | Calidad | Código documentado | Documentación del código siguiendo estándares de .NET |
-| RNF05 | Calidad | Patrones de diseño | Implementación de patrones de diseño adecuados |
-| RNF06 | Calidad | Pruebas unitarias | Desarrollo de pruebas unitarias con cobertura mínima del 60% |
 
 ## Especificación de Casos de Uso
 
@@ -164,7 +160,7 @@ El Sistema de Votaciones para Asambleas de Propiedad Horizontal es una aplicaci�
 | **Actores** | Sistema |
 | **Descripción** | Envío automático de notificaciones por correo para eventos del sistema |
 | **Precondiciones** | Debe ocurrir un evento que requiera notificación |
-| **Flujo principal** | 1. Se produce un evento (nueva votación, cierre, etc.)<br>2. El sistema identifica los destinatarios<br>3. Genera el contenido del mensaje<br>4. Envía las notificaciones por correo |
+| **Flujo principal** | 1. Se produce un evento (nueva votación)<br>2. El sistema identifica los destinatarios<br>3. Genera el contenido del mensaje<br>4. Envía las notificaciones por correo |
 | **Flujos alternativos** | - Reenvío en caso de fallo<br>- Notificaciones programadas |
 | **Postcondiciones** | Los usuarios reciben las notificaciones correspondientes |
 
